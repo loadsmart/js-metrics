@@ -1,0 +1,85 @@
+tag-pattern: &tag-pattern
+  only: /^\d+\.\d+\.\d+$/
+
+job_defaults: &job_defaults
+  working_directory: /home/circleci/metrics
+
+version: 2
+jobs:
+  checkout-code:
+    <<: *job_defaults
+    docker:
+      - image: alpine/git:latest
+    steps:
+      - checkout
+      - save_cache:
+          key: repo-{{ .Environment.CIRCLE_SHA1 }}
+          paths:
+            - /home/circleci/metrics
+
+  install-deps:
+    <<: *job_defaults
+    docker:
+      - image: circleci/node:12.7.0-stretch-browsers
+    steps:
+      - restore_cache:
+          key: repo-{{ .Environment.CIRCLE_SHA1 }}
+      - restore_cache:
+          key: lock-{{ checksum "yarn.lock" }}
+      - run:
+          name: Install Dependencies
+          command: yarn
+      - save_cache:
+          key: lock-{{ checksum "yarn.lock" }}
+          paths:
+            - node_modules
+
+  lint:
+    <<: *job_defaults
+    docker:
+      - image: circleci/node:12.7.0-stretch-browsers
+    steps:
+      - restore_cache:
+          key: repo-{{ .Environment.CIRCLE_SHA1 }}
+      - restore_cache:
+          key: lock-{{ checksum "yarn.lock" }}
+      - run:
+          name: Lint
+          command: yarn lint
+
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - checkout-code:
+          context: org-global
+          filters:
+            tags:
+              <<: *tag-pattern
+
+      - install-deps:
+          context: org-global
+          requires:
+            - checkout-code
+          filters:
+            tags:
+              <<: *tag-pattern
+
+      - lint:
+          context: org-global
+          requires:
+            - install-deps
+          filters:
+            tags:
+              <<: *tag-pattern
+
+      - deploy:
+          context: org-global
+          requires:
+            - lint
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              <<: *tag-pattern
+
