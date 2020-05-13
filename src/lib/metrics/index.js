@@ -34,6 +34,10 @@ export default class Metrics {
     })
   }
 
+  getLogger() {
+    return datadogLogs.getLogger(LOGGER_NAME)
+  }
+
   sendMetric(type, name, tags) {
     return this.getLogger().log(name, { metric_type: type, tags })
   }
