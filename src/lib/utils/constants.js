@@ -4,11 +4,8 @@ export const INITIAL_CONFIG = {
   },
 }
 
+export const LOGGER_NAME = 'metrics'
+
 export const METRIC_TYPES = {
   COUNT: 'count',
-  RATE: 'rate',
-  GAUGE: 'gauge',
-  SET: 'set',
-  HISTOGRAM: 'histogram',
-  DISTRIBUTION: 'distribution',
 }
