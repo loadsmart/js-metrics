@@ -1,1 +1,1 @@
-export { default } from './metrics'
+export * as metrics from './metrics'
