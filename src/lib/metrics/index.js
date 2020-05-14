@@ -1,6 +1,6 @@
 import { datadogLogs } from '@datadog/browser-logs'
 
-import { getGlobalConfig, setGlobalConfig, addGlobalContext } from '../utils/globalConfig'
+import { getGlobalConfig, setGlobalConfig, setGlobalContext } from '../utils/globalConfig'
 import { METRIC_TYPES, LOGGER_NAME } from '../utils/constants'
 
 const initializeDatadog = (key, ...props) => {
@@ -15,7 +15,7 @@ const initializeDatadog = (key, ...props) => {
 
 const initializeGlobalConfig = (appName, config) => {
   setGlobalConfig(config)
-  addGlobalContext({ app_name: appName })
+  setGlobalContext({ app_name: appName })
 }
 
 const initializeLogger = () => {
