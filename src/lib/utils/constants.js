@@ -1,4 +1,5 @@
 export const INITIAL_CONFIG = {
+  initialized: false,
   context: {
     type: 'metric',
   },

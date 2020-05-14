@@ -1,48 +1,52 @@
 import { datadogLogs } from '@datadog/browser-logs'
 
-import { getGlobalConfig, setGlobalConfig } from '../utils/globalConfig'
+import { getGlobalConfig, setGlobalConfig, addGlobalContext } from '../utils/globalConfig'
 import { METRIC_TYPES, LOGGER_NAME } from '../utils/constants'
 
-export default class Metrics {
-  init(appName, key, config, ...props) {
-    if (!key) {
-      return console.error('A client key is required to use metrics.')
-    }
+const initializeDatadog = (key, ...props) => {
+  datadogLogs.init({
+    clientToken: key,
+    datacenter: 'us',
+    forwardErrorsToLogs: false,
+    sampleRate: 100,
+    ...props,
+  })
+}
 
-    this.initializeDatadog(key, ...props)
-    this.initializeGlobalConfig(appName, config)
-    this.initializeLogger()
+const initializeGlobalConfig = (appName, config) => {
+  setGlobalConfig(config)
+  addGlobalContext({ app_name: appName })
+}
+
+const initializeLogger = () => {
+  const { context } = getGlobalConfig()
+  datadogLogs.createLogger(LOGGER_NAME, { context })
+}
+
+const getLogger = () => datadogLogs.getLogger(LOGGER_NAME)
+
+const sendMetric = (type, name, tags) => {
+  const { initialized } = getGlobalConfig()
+
+  if (!initialized) {
+    return console.warn('Metrics not initialized, skipping...')
   }
 
-  initializeLogger() {
-    const { context } = getGlobalConfig()
-    datadogLogs.createLogger(LOGGER_NAME, context)
-  }
-
-  initializeGlobalConfig(appName, config) {
-    setGlobalConfig(config)
-    addGlobalContext({ app_name: appName })
-  }
-
-  initializeDatadog(key, ...props) {
-    datadogLogs.init({
-      clientToken: key,
-      datacenter: 'us',
-      forwardErrorsToLogs: false,
-      sampleRate: 100,
-      ...props,
-    })
-  }
-
-  getLogger() {
-    return datadogLogs.getLogger(LOGGER_NAME)
-  }
-
-  sendMetric(type, name, tags) {
-    return this.getLogger().log(name, { metric_type: type, tags })
-  }
-
-  count(...props) {
-    return this.sendMetric(METRIC_TYPES.COUNT, ...props)
+  try {
+    return getLogger().log(name, { metric_type: type, tags })
+  } catch (e) {
+    return console.error('Failed to send metric', e)
   }
 }
+
+export const init = (appName, key, config, ...props) => {
+  if (!key) {
+    return console.error('A client key is required to use metrics.')
+  }
+
+  initializeDatadog(key, ...props)
+  initializeGlobalConfig(appName, { initialized: true, ...config })
+  initializeLogger()
+}
+
+export const count = (...props) => sendMetric(METRIC_TYPES.COUNT, ...props)
