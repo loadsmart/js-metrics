@@ -1,0 +1,13 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: js-metrics
+  description: JavaScript metrics by Loadsmart
+  annotations:
+    github.com/project-slug: loadsmart/js-metrics
+  tags:
+    - javascript
+spec:
+  type: other
+  lifecycle: production
+  owner: <CODE-OWNER>
