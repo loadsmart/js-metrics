@@ -1,0 +1,18 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: js-metrics
+  description: JavaScript metrics by Loadsmart
+  annotations:
+    github.com/project-slug: loadsmart/js-metrics
+  tags:
+    - javascript
+    - metrics
+    - datadog
+  links:
+    - title: NPM package
+      url: https://www.npmjs.com/package/@loadsmart/js-metrics
+spec:
+  type: library
+  lifecycle: production
+  owner: frontend
