@@ -7,7 +7,12 @@ metadata:
     github.com/project-slug: loadsmart/js-metrics
   tags:
     - javascript
+    - metrics
+    - datadog
+  links:
+    - title: NPM package
+      url: https://www.npmjs.com/package/@loadsmart/js-metrics
 spec:
-  type: other
+  type: library
   lifecycle: production
-  owner: <CODE-OWNER>
+  owner: frontend
