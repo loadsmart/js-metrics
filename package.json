@@ -11,7 +11,7 @@
     "dist/*"
   ],
   "dependencies": {
-    "@datadog/browser-logs": "^1.11.4"
+    "@datadog/browser-logs": "^1.26.3"
   },
   "devDependencies": {
     "@babel/cli": "^7.8.4",
